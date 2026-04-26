@@ -1,0 +1,30 @@
+# Netlify configuration for the GrabIt frontend.
+#
+# IMPORTANT: This file lives inside the artifact folder.
+# In your Netlify site settings, set:
+#   Base directory:        artifacts/downloader
+#   Build command:         (uses the [build] section below)
+#   Publish directory:     dist/public
+#
+# Then, in Site settings → Environment variables, add:
+#   VITE_API_URL = https://YOUR-RENDER-BACKEND.onrender.com
+#   PORT         = 5173
+#   BASE_PATH    = /
+#
+# Replace YOUR-RENDER-BACKEND with the URL Render gives you.
+
+[build]
+  base    = "artifacts/downloader"
+  publish = "dist/public"
+  command = "corepack enable && pnpm install --filter @workspace/downloader... --frozen-lockfile=false && pnpm --filter @workspace/downloader run build"
+
+[build.environment]
+  NODE_VERSION = "20"
+  PORT         = "5173"
+  BASE_PATH    = "/"
+
+# SPA fallback so client-side routes work
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
