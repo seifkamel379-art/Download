@@ -13,9 +13,29 @@ function resolveYtDlpBinary(): string {
   const envBin = process.env["YT_DLP_PATH"];
   if (envBin) candidates.push(envBin);
 
+  // Prefer the system-installed yt-dlp first (pip in production / nix in dev) —
+  // it gets updated regularly. The bundled binary in youtube-dl-exec is often
+  // months out of date, which causes YouTube TLS/extractor errors.
+  candidates.push("/usr/local/bin/yt-dlp", "/usr/bin/yt-dlp");
+
+  try {
+    const out = execSync("which yt-dlp", {
+      stdio: ["ignore", "pipe", "ignore"],
+    })
+      .toString()
+      .trim();
+    if (out) candidates.push(out);
+  } catch {
+    // ignore
+  }
+
+  // Fall back to the bundled binary only as a last resort.
   try {
     const here = path.dirname(fileURLToPath(import.meta.url));
     candidates.push(
+      // From dist/index.mjs (production build)
+      path.resolve(here, "../node_modules/youtube-dl-exec/bin/yt-dlp"),
+      // From src/routes/download.ts (dev build paths)
       path.resolve(here, "../../node_modules/youtube-dl-exec/bin/yt-dlp"),
       path.resolve(here, "../../../node_modules/youtube-dl-exec/bin/yt-dlp"),
       path.resolve(here, "../../../../node_modules/youtube-dl-exec/bin/yt-dlp"),
@@ -24,25 +44,8 @@ function resolveYtDlpBinary(): string {
     // ignore
   }
 
-  candidates.push(
-    "/usr/local/bin/yt-dlp",
-    "/usr/bin/yt-dlp",
-    "/home/runner/workspace/node_modules/.pnpm/youtube-dl-exec@3.1.5/node_modules/youtube-dl-exec/bin/yt-dlp",
-  );
-
   for (const candidate of candidates) {
     if (candidate && existsSync(candidate)) return candidate;
-  }
-
-  try {
-    const out = execSync("which yt-dlp", {
-      stdio: ["ignore", "pipe", "ignore"],
-    })
-      .toString()
-      .trim();
-    if (out) return out;
-  } catch {
-    // ignore
   }
 
   return "yt-dlp";
@@ -80,18 +83,29 @@ interface InfoResponse {
   formats: InfoFormat[];
 }
 
+const COMMON_ARGS: string[] = [
+  "--no-warnings",
+  "--no-call-home",
+  "--no-check-certificates",
+  "--no-playlist",
+  "--geo-bypass",
+  "--retries",
+  "5",
+  "--fragment-retries",
+  "5",
+  "--extractor-args",
+  "youtube:player_client=web_safari,android,ios,mweb",
+  "--user-agent",
+  "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36",
+  "--add-header",
+  "Accept-Language:en-US,en;q=0.9",
+];
+
 function runYtDlpJson(url: string): Promise<Record<string, unknown>> {
   return new Promise((resolve, reject) => {
     const child = spawn(
       ytDlpBinary,
-      [
-        url,
-        "--dump-single-json",
-        "--no-warnings",
-        "--no-call-home",
-        "--no-check-certificates",
-        "--no-playlist",
-      ],
+      [url, "--dump-single-json", ...COMMON_ARGS],
       { stdio: ["ignore", "pipe", "pipe"] },
     );
 
@@ -187,16 +201,27 @@ router.post("/info", async (req: Request, res: Response) => {
         };
       });
 
+    // Collect heights from ALL raw formats (including DASH) — yt-dlp can
+    // merge separate video+audio DASH streams during download, so we should
+    // expose those heights in the UI even though we filter them from `formats`.
     const heightSet = new Set<number>();
-    formats.forEach((f) => {
-      if (f.hasVideo && f.height) heightSet.add(f.height);
+    rawFormats.forEach((f) => {
+      const ext = String(f["ext"] ?? "");
+      if (ext === "mhtml") return;
+      const proto = String(f["protocol"] ?? "");
+      if (proto.includes("m3u8")) return; // skip HLS live
+      const vcodec = String(f["vcodec"] ?? "none");
+      const hasVideo = vcodec !== "none" && vcodec !== "";
+      if (!hasVideo) return;
+      const h = typeof f["height"] === "number" ? (f["height"] as number) : 0;
+      if (h > 0) heightSet.add(h);
     });
     const PRESETS = [2160, 1440, 1080, 720, 480, 360, 240, 144];
     const availableHeights = Array.from(heightSet)
       .filter((h) => PRESETS.includes(h))
       .sort((a, b) => b - a);
 
-    const isAudio = formats.length > 0 && formats.every((f) => f.audioOnly);
+    const isAudio = availableHeights.length === 0;
 
     const payload: InfoResponse = {
       title: String(raw["title"] ?? "video"),
@@ -273,10 +298,7 @@ router.get("/download", (req: Request, res: Response) => {
       "0",
       "-o",
       tmpTemplate,
-      "--no-playlist",
-      "--no-warnings",
-      "--no-call-home",
-      "--no-check-certificates",
+      ...COMMON_ARGS,
       "--quiet",
       "--print",
       "after_move:filepath",
@@ -297,10 +319,7 @@ router.get("/download", (req: Request, res: Response) => {
       "mp4",
       "-o",
       tmpTemplate,
-      "--no-playlist",
-      "--no-warnings",
-      "--no-call-home",
-      "--no-check-certificates",
+      ...COMMON_ARGS,
       "--quiet",
       "--print",
       "after_move:filepath",

@@ -5,10 +5,13 @@ import { FormatList } from "@/components/FormatList";
 import { detectPlatform, platforms } from "@/lib/platforms";
 import { fetchInfo, formatDuration, type VideoInfo } from "@/lib/api";
 
-const HERO_GRADIENT =
-  "radial-gradient(80% 60% at 20% 0%, rgba(212,165,116,0.20), transparent 60%), radial-gradient(60% 50% at 80% 0%, rgba(184,115,51,0.18), transparent 60%), linear-gradient(180deg, #1F1410 0%, #2A1810 60%, #3A2418 100%)";
+const PAGE_BG =
+  "radial-gradient(80% 60% at 20% 0%, rgba(232,210,180,0.55), transparent 60%), radial-gradient(60% 50% at 80% 0%, rgba(212,180,140,0.45), transparent 60%), linear-gradient(180deg, #FBF7F0 0%, #F5EBD9 60%, #EDE0C8 100%)";
 
-const BRAND_GRADIENT = "linear-gradient(135deg, #B87333 0%, #6F4E37 100%)";
+const BRAND_GRADIENT = "linear-gradient(135deg, #C9A678 0%, #A88B5E 100%)";
+const BRAND_PRIMARY = "#A88B5E";
+const TEXT_DARK = "#3D2817";
+const TEXT_MUTED = "#6B5440";
 
 export default function Home() {
   const [url, setUrl] = useState("");
@@ -41,29 +44,35 @@ export default function Home() {
   };
 
   useEffect(() => {
-    document.title = "GrabIt — حمّل أي فيديو من أي رابط";
+    document.title = "Download 10 — حمّل أي فيديو من أي رابط";
   }, []);
 
   return (
     <div
-      className="min-h-screen w-full text-amber-50"
+      className="min-h-screen w-full"
       dir="rtl"
-      style={{ background: HERO_GRADIENT }}
+      style={{ background: PAGE_BG, color: TEXT_DARK }}
     >
       {/* Top bar */}
       <header className="mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-8">
         <div className="flex items-center gap-2">
           <span
-            className="flex h-9 w-9 items-center justify-center rounded-xl shadow-lg"
+            className="flex h-9 w-9 items-center justify-center rounded-xl text-white shadow-md"
             style={{ background: BRAND_GRADIENT }}
           >
             <Download size={18} />
           </span>
-          <span className="text-lg font-bold tracking-tight">GrabIt</span>
+          <span
+            className="text-lg font-bold tracking-tight"
+            style={{ color: TEXT_DARK }}
+          >
+            Download 10
+          </span>
         </div>
         <a
           href="#platforms"
-          className="text-xs font-medium text-amber-100/70 hover:text-amber-50 transition-colors"
+          className="text-xs font-medium transition-colors hover:opacity-80"
+          style={{ color: TEXT_MUTED }}
         >
           {platforms.length}+ منصة مدعومة
         </a>
@@ -71,17 +80,32 @@ export default function Home() {
 
       {/* Hero */}
       <section className="mx-auto max-w-4xl px-4 sm:px-8 pt-2 sm:pt-4 pb-10 text-center">
-        <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-amber-100/15 bg-amber-50/5 px-3 py-1 text-[11px] font-medium text-amber-50/80 backdrop-blur">
+        <div
+          className="mx-auto inline-flex items-center gap-2 rounded-full border bg-white/60 px-3 py-1 text-[11px] font-medium backdrop-blur"
+          style={{ borderColor: "#E5D6BD", color: TEXT_MUTED }}
+        >
           مجاني · بدون تسجيل · صوت + فيديو
         </div>
-        <h1 className="mt-5 text-3xl sm:text-5xl md:text-6xl font-bold leading-[1.2] tracking-tight">
+        <h1
+          className="mt-5 text-3xl sm:text-5xl md:text-6xl font-bold leading-[1.2] tracking-tight"
+          style={{ color: TEXT_DARK }}
+        >
           حمّل أي فيديو
           <br />
-          <span className="bg-gradient-to-r from-amber-200 via-orange-200 to-amber-100 bg-clip-text text-transparent">
+          <span
+            className="bg-clip-text text-transparent"
+            style={{
+              backgroundImage:
+                "linear-gradient(135deg, #B8956A 0%, #8B6F47 100%)",
+            }}
+          >
             من أي رابط بكل سهولة
           </span>
         </h1>
-        <p className="mx-auto mt-4 max-w-xl text-sm sm:text-base text-amber-50/70">
+        <p
+          className="mx-auto mt-4 max-w-xl text-sm sm:text-base"
+          style={{ color: TEXT_MUTED }}
+        >
           الصق رابط الفيديو أو الصوت، اختار الجودة، وحمّل في ثواني. بيدعم أكبر
           منصات في العالم.
         </p>
@@ -93,15 +117,18 @@ export default function Home() {
           data-testid="form-url"
         >
           <div
-            className="group flex items-stretch overflow-hidden rounded-2xl border-2 bg-amber-50/5 backdrop-blur-md shadow-2xl transition-all"
+            className="group flex items-stretch overflow-hidden rounded-2xl border-2 bg-white shadow-xl transition-all"
             style={{
-              borderColor: platform ? platform.color : "rgba(212,165,116,0.35)",
+              borderColor: platform ? platform.color : "#D9C5A4",
               boxShadow: platform
-                ? `0 20px 60px -20px ${platform.color}80, 0 0 0 4px ${platform.color}20`
-                : "0 20px 60px -25px rgba(184,115,51,0.5)",
+                ? `0 16px 40px -20px ${platform.color}55, 0 0 0 4px ${platform.color}18`
+                : "0 16px 40px -20px rgba(168,139,94,0.35)",
             }}
           >
-            <div className="flex items-center pe-2 ps-4 text-amber-100/50">
+            <div
+              className="flex items-center pe-2 ps-4"
+              style={{ color: TEXT_MUTED }}
+            >
               <Link2 size={18} />
             </div>
             <input
@@ -112,14 +139,16 @@ export default function Home() {
               onChange={(e) => setUrl(e.target.value)}
               placeholder="الصق الرابط هنا…"
               dir="ltr"
-              className="flex-1 bg-transparent px-3 py-4 text-sm sm:text-base text-amber-50 placeholder-amber-100/40 outline-none text-start"
+              className="flex-1 bg-transparent px-3 py-4 text-sm sm:text-base outline-none text-start"
+              style={{ color: TEXT_DARK }}
               data-testid="input-url"
             />
             {url && (
               <button
                 type="button"
                 onClick={handleClear}
-                className="px-2 text-amber-100/40 hover:text-amber-50"
+                className="px-2 transition-colors hover:opacity-70"
+                style={{ color: TEXT_MUTED }}
                 aria-label="مسح"
                 data-testid="button-clear"
               >
@@ -166,7 +195,7 @@ export default function Home() {
             </div>
           )}
           {!platform && url.trim() && (
-            <div className="mt-3 text-xs text-amber-100/50">
+            <div className="mt-3 text-xs" style={{ color: TEXT_MUTED }}>
               مش متعرف على المنصة، بس هنحاول نشغّله بالمستخرج العام.
             </div>
           )}
@@ -174,13 +203,18 @@ export default function Home() {
 
         {error && (
           <div
-            className="mx-auto mt-6 flex max-w-2xl items-start gap-3 rounded-xl border border-rose-500/40 bg-rose-500/10 px-4 py-3 text-start text-sm text-rose-100"
+            className="mx-auto mt-6 flex max-w-2xl items-start gap-3 rounded-xl border px-4 py-3 text-start text-sm"
+            style={{
+              borderColor: "#E5B89A",
+              background: "#FBEFE3",
+              color: "#7A3B1F",
+            }}
             data-testid="text-error"
           >
             <AlertCircle size={18} className="mt-0.5 shrink-0" />
             <div className="space-y-1 min-w-0">
               <div className="font-semibold">معرفناش نجيب الرابط ده</div>
-              <div className="text-rose-200/80 break-words" dir="ltr">
+              <div className="break-words opacity-80" dir="ltr">
                 {error}
               </div>
             </div>
@@ -192,11 +226,15 @@ export default function Home() {
       {info && (
         <section className="mx-auto max-w-5xl px-4 sm:px-8 pb-16">
           <div
-            className="overflow-hidden rounded-3xl border border-amber-200/20 bg-amber-50/95 text-zinc-900 shadow-2xl"
+            className="overflow-hidden rounded-3xl border bg-white text-zinc-900 shadow-xl"
+            style={{ borderColor: "#E5D6BD" }}
             data-testid="card-result"
           >
             <div className="flex flex-col md:flex-row">
-              <div className="md:w-2/5 bg-amber-100">
+              <div
+                className="md:w-2/5"
+                style={{ background: "#F5EBD9" }}
+              >
                 {info.thumbnail ? (
                   <img
                     src={info.thumbnail}
@@ -204,13 +242,19 @@ export default function Home() {
                     className="h-56 w-full object-cover md:h-full"
                   />
                 ) : (
-                  <div className="flex h-56 w-full items-center justify-center text-amber-700/60 md:h-full">
+                  <div
+                    className="flex h-56 w-full items-center justify-center md:h-full"
+                    style={{ color: TEXT_MUTED }}
+                  >
                     لا توجد معاينة
                   </div>
                 )}
               </div>
               <div className="flex-1 p-5 sm:p-6">
-                <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-zinc-500">
+                <div
+                  className="flex flex-wrap items-center gap-2 text-xs font-medium"
+                  style={{ color: TEXT_MUTED }}
+                >
                   {platform && (
                     <span
                       className="inline-flex items-center gap-1 rounded-full px-2 py-0.5"
@@ -224,7 +268,13 @@ export default function Home() {
                     </span>
                   )}
                   {!platform && (
-                    <span className="rounded-full bg-amber-100 px-2 py-0.5 text-amber-900">
+                    <span
+                      className="rounded-full px-2 py-0.5"
+                      style={{
+                        background: "#F5EBD9",
+                        color: TEXT_DARK,
+                      }}
+                    >
                       {info.extractor}
                     </span>
                   )}
@@ -242,6 +292,7 @@ export default function Home() {
                 <h2
                   className="mt-2 text-lg sm:text-xl font-bold leading-tight"
                   dir="auto"
+                  style={{ color: TEXT_DARK }}
                   data-testid="text-title"
                 >
                   {info.title}
@@ -263,14 +314,18 @@ export default function Home() {
       {/* Platforms strip */}
       <section
         id="platforms"
-        className="border-t border-amber-100/10 bg-black/30 backdrop-blur-md"
+        className="border-t bg-white/40 backdrop-blur-md"
+        style={{ borderColor: "#E5D6BD" }}
       >
         <div className="mx-auto max-w-6xl px-4 sm:px-8 py-8">
           <div className="mb-4">
-            <h2 className="text-base font-bold text-amber-50">
+            <h2
+              className="text-base font-bold"
+              style={{ color: TEXT_DARK }}
+            >
               المنصات المدعومة
             </h2>
-            <p className="text-xs text-amber-50/60">
+            <p className="text-xs" style={{ color: TEXT_MUTED }}>
               دوس على أي منصة عشان تشوف شكل الرابط.
             </p>
           </div>
@@ -284,9 +339,14 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="mx-auto max-w-6xl px-4 sm:px-8 py-6 text-center text-xs text-amber-50/40">
+      <footer
+        className="mx-auto max-w-6xl px-4 sm:px-8 py-6 text-center text-xs"
+        style={{ color: TEXT_MUTED }}
+      >
         استخدم الموقع باحترام لشروط كل منصة.
       </footer>
     </div>
   );
 }
+
+void BRAND_PRIMARY;
