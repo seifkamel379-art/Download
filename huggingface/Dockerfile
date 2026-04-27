@@ -14,8 +14,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         python3 python3-pip ca-certificates curl git ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
-# Hugging Face Spaces run as non-root user "user" (UID 1000).
-RUN useradd -m -u 1000 user || true
+# Install pnpm globally as root before dropping privileges.
+RUN npm install -g pnpm@10
+
+# The node:20 base image already ships a `node` user at UID 1000.
+# Remove it and create `user` at UID 1000 (Hugging Face Spaces convention).
+RUN userdel -r node 2>/dev/null; \
+    useradd -m -u 1000 user
+
 USER user
 ENV HOME=/home/user
 WORKDIR /home/user
@@ -26,8 +32,7 @@ ARG GITHUB_REPO=https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME.git
 RUN git clone --depth 1 "$GITHUB_REPO" app
 WORKDIR /home/user/app
 
-# Install pnpm and the project (yt-dlp binary is downloaded as part of this).
-RUN npm install -g pnpm@10
+# Install dependencies (this also downloads the yt-dlp binary) and build.
 RUN pnpm install --frozen-lockfile=false
 RUN pnpm --filter @workspace/api-server run build
 
