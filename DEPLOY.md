@@ -1,6 +1,8 @@
 # خطوات النشر — GrabIt
 
-دليل خطوة بخطوة لنشر الموقع: السيرفر على **Render** (مجاني، بدون فيزا) والواجهة على **Netlify** (مجاني، بدون فيزا).
+دليل خطوة بخطوة لنشر الموقع مجانًا **بدون أي كارت ائتماني**:
+- السيرفر على **Hugging Face Spaces** (مجاني تمامًا، بس إيميل)
+- الواجهة على **Netlify** (مجاني، بدون كارت)
 
 ---
 
@@ -8,65 +10,109 @@
 
 (لو رفعته قبل كده تخطى الخطوة)
 
-1. اعمل حساب على [github.com](https://github.com) لو لسه ماعندكش.
+1. اعمل حساب على [github.com](https://github.com).
 2. اعمل Repository جديد فاضي (مثلًا اسمه `grabit`). خلّيه **Public**.
-3. ارجع لـ Replit، افتح تبويب **Git** على اليسار، وارفع المشروع لـ GitHub.
+3. ارجع لـ Replit، افتح تبويب **Git** على اليسار، واضغط **Create Repository** علشان يرفعهولك أوتوماتيك.
+4. سجّل اسم الـ repo بالظبط، شكله كده:
 
-> لو محتاج مساعدة، استعمل زرار **Create Repository** الموجود في تبويب Git داخل Replit، هيرفعهولك أوتوماتيك.
+   ```
+   https://github.com/USERNAME/grabit.git
+   ```
+
+   هتحتاج الرابط ده في الخطوة الجاية.
 
 ---
 
-## 2) السيرفر على Render (مجاني)
+## 2) السيرفر على Hugging Face Spaces (مجاني، بدون كارت)
 
-Render هيشغّل الـ API اللي بيستخرج روابط الفيديوهات.
+1. ادخل على [huggingface.co/join](https://huggingface.co/join) واعمل حساب بالإيميل (بس).
+2. بعد التسجيل، ادخل على [huggingface.co/new-space](https://huggingface.co/new-space).
+3. املأ النموذج كده:
+   - **Space name**: `grabit-api` (أو أي اسم تحبه)
+   - **License**: `mit`
+   - **Select the Space SDK**: اختار **Docker** ← مهم
+   - **Docker template**: اختار **Blank**
+   - **Space hardware**: سيب الافتراضي **CPU basic · Free**
+   - **Public** أو **Private**: اختار **Public**
+4. اضغط **Create Space**.
+5. هيفتحلك الـ Space وهتلاقي تبويب **Files** فوق. اضغط عليه.
+6. هترفع ملفين بس من المشروع بتاعك (موجودين في فولدر `huggingface/` في الريبو):
 
-1. ادخل على [render.com](https://render.com) وسجّل بحساب GitHub بتاعك (مجاني، **مايطلبش فيزا**).
-2. من لوحة التحكم اضغط **New +** → **Blueprint**.
-3. اختر الـ Repository بتاع `grabit` اللي رفعته.
-4. Render هيلاقي ملف `render.yaml` بشكل أوتوماتيكي ويقترح إنشاء الخدمة `grabit-api`. اضغط **Apply**.
-5. استنى التظبيط (أول مرة بياخد 5–10 دقايق لأنه بيحمّل yt-dlp).
-6. لما يخلص، هتلاقي **URL الخدمة** فوق، شكله كده:
+   **أ) ملف `Dockerfile`:**
+   - افتح ملف `huggingface/Dockerfile` من Replit.
+   - **مهم جدًا:** غيّر السطر ده:
+
+     ```
+     ARG GITHUB_REPO=https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME.git
+     ```
+
+     بحيث يكون فيه رابط الـ GitHub repo بتاعك من الخطوة 1، يعني مثلًا:
+
+     ```
+     ARG GITHUB_REPO=https://github.com/USERNAME/grabit.git
+     ```
+
+   - في صفحة الـ Space اضغط **Add file** → **Create a new file**.
+   - الاسم: `Dockerfile` (بحرف D كبير، بدون أي امتداد).
+   - الصق محتوى الملف بعد التعديل.
+   - اضغط **Commit new file to main**.
+
+   **ب) ملف `README.md`:**
+   - في نفس صفحة Files اضغط **Add file** → **Create a new file**.
+   - الاسم: `README.md`.
+   - افتح ملف `huggingface/README.md` من Replit وانسخ كل محتواه والصقه.
+   - اضغط **Commit new file to main**.
+
+7. بمجرد ما ترفع الملفين، Hugging Face هيبدأ يبني السيرفر تلقائيًا. اضغط تبويب **App** فوق علشان تشوف اللوغ.
+8. أول build بياخد **5–10 دقايق** (لأنه بيحمّل Node, Python, ffmpeg, yt-dlp). استنى لحد ما تشوف:
 
    ```
-   https://grabit-api.onrender.com
+   Server listening port: 7860
    ```
 
-   **انسخ الـ URL ده** — هتحتاجه في الخطوة الجاية.
-
-7. تأكّد إنه شغّال بزيارة:
+9. **رابط السيرفر بتاعك** هيكون شكله كده:
 
    ```
-   https://grabit-api.onrender.com/api/healthz
+   https://USERNAME-grabit-api.hf.space
    ```
 
-   لازم تشوف: `{"status":"ok"}`.
+   تقدر تشوفه فوق في تبويب **App** (في زرار "Direct URL" أو من الـ embed).
 
-> ⚠️ **ملاحظة:** الخطة المجانية في Render بتنام السيرفر بعد 15 دقيقة بدون استخدام. أول طلب بعد النوم بياخد ~30 ثانية. ده طبيعي.
+10. اختبره بزيارة:
+
+    ```
+    https://USERNAME-grabit-api.hf.space/api/healthz
+    ```
+
+    لازم تشوف: `{"status":"ok"}`.
+
+> ✅ **مفيش كارت، مفيش حدود زمنية للتشغيل، 16GB RAM مجاني.** الـ Space بيدخل في وضع Sleep بعد 48 ساعة بدون استخدام، وأول طلب بعد كده بياخد ~30 ثانية يصحى.
 
 ---
 
-## 3) الواجهة على Netlify (مجاني)
+## 3) الواجهة على Netlify (مجاني، بدون كارت)
 
-1. ادخل على [netlify.com](https://netlify.com) وسجّل بحساب GitHub (مجاني، **مايطلبش فيزا**).
-2. اضغط **Add new site** → **Import an existing project** → اختار **GitHub** → اختار repo `grabit`.
-3. Netlify هيقرأ ملف `artifacts/downloader/netlify.toml` بشكل أوتوماتيك. لكن لازم تظبط حاجة واحدة:
-   - في صفحة الإعدادات اللي ظاهرة قبل النشر اضغط على **Base directory** وحطّ:
-
-     ```
-     artifacts/downloader
-     ```
-
+1. ادخل على [netlify.com](https://netlify.com) وسجّل بحساب GitHub.
+2. اضغط **Add new site** → **Import an existing project** → **GitHub** → اختار repo `grabit`.
+3. في صفحة الإعدادات قبل النشر:
+   - **Base directory**: `artifacts/downloader`
+   - الباقي سيبه افتراضي (Netlify بيقرأ ملف `netlify.toml` تلقائيًا).
 4. اضغط **Deploy site**.
-5. لما يخلص أول build، روح **Site settings → Environment variables** واضغط **Add a variable**، وضيف المتغيرات دي:
+5. لما يخلص أول build، روح **Site settings → Environment variables** → **Add a variable**، وضيف:
 
-   | الاسم          | القيمة                                |
-   |----------------|---------------------------------------|
-   | `VITE_API_URL` | `https://grabit-api.onrender.com` (الـ URL من Render) |
-   | `PORT`         | `5173`                                |
-   | `BASE_PATH`    | `/`                                   |
+   | الاسم          | القيمة                                              |
+   |----------------|------------------------------------------------------|
+   | `VITE_API_URL` | رابط Hugging Face بتاعك (من الخطوة 9 فوق)         |
+   | `PORT`         | `5173`                                               |
+   | `BASE_PATH`    | `/`                                                  |
+
+   مثال على القيمة:
+   ```
+   VITE_API_URL = https://username-grabit-api.hf.space
+   ```
 
 6. ارجع لتبويب **Deploys** واضغط **Trigger deploy** → **Deploy site** علشان يعيد البناء بالمتغيرات الجديدة.
-7. لما يخلص، Netlify هيديك URL شكله:
+7. بعد ما يخلص، Netlify هيديك URL شكله:
 
    ```
    https://your-site-name.netlify.app
@@ -76,9 +122,10 @@ Render هيشغّل الـ API اللي بيستخرج روابط الفيديو
 
 ---
 
-## 4) (اختياري) دومين خاص بيك
+## 4) لما تعدّل الكود
 
-- في Netlify: **Site settings → Domain management** تقدر تربط دومين مجاني `.netlify.app` أو دومين بتاعك.
+- **الواجهة**: Netlify بيعيد البناء أوتوماتيك مع كل push على GitHub. اعمل push وخلاص.
+- **السيرفر**: Hugging Face بيستخدم نسخة مكلونة من GitHub، علشان يجيب آخر تعديلاتك ادخل على الـ Space → **Settings** → **Factory rebuild**. هيعيد build من الصفر بأحدث كود.
 
 ---
 
@@ -86,10 +133,11 @@ Render هيشغّل الـ API اللي بيستخرج روابط الفيديو
 
 | المشكلة | الحل |
 |---------|------|
-| Render build فشل | افتح **Logs** في Render، غالبًا الحل إعادة المحاولة (Manual Deploy). |
-| الموقع شغال بس مفيش تحميل | تأكّد إن `VITE_API_URL` صح، وإن سيرفر Render فايق (افتح `/api/healthz`). |
-| الفيديو بياخد وقت ينزل | الخطة المجانية في Render فيها bandwidth محدود — ده طبيعي. |
-| فيديو معين مش بينزل | بعض المنصات بتغيّر حمايتها. yt-dlp بتتحدث باستمرار — اعمل **Manual Deploy** في Render علشان ينزّل أحدث نسخة. |
+| Hugging Face build فشل | اضغط تبويب **Logs**، غالبًا الحل تعديل رابط GitHub داخل Dockerfile أو إعادة المحاولة. |
+| الموقع شغّال بس مفيش تحميل | تأكّد إن `VITE_API_URL` صح، وإن السيرفر فايق (افتح `/api/healthz`). |
+| فيديو معيّن مش بينزل | بعض المنصات بتغيّر حمايتها. yt-dlp بتتحدث باستمرار — اعمل **Factory rebuild** في Hugging Face علشان ينزّل أحدث نسخة. |
+| السيرفر بطيء أول مرة | لو الـ Space نام (بعد 48 ساعة من عدم الاستخدام) أول طلب بياخد ~30 ثانية. اللي بعده طبيعي. |
+| طلع لي خطأ CORS | السيرفر مفتوح لأي origin، فلو حصل ده اعمل rebuild للـ Space. |
 
 ---
 

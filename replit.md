@@ -13,9 +13,9 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
   - `POST /api/info` → metadata + filtered formats
   - `GET  /api/download?url=...&formatId=...&audioOnly=...` → streams the file with proper `Content-Disposition`
 - **Supported platforms (12)**: YouTube, TikTok, Facebook, Instagram, X, Vimeo, Twitch, SoundCloud, Reddit, Dailymotion, Pinterest, LinkedIn — each rendered with brand color in the bottom strip.
-- **Frontend env**: `VITE_API_URL` (empty in dev → same-origin proxy). In prod set to the Render URL.
-- **Deployment**: see `DEPLOY.md` (Arabic) — frontend on Netlify, backend on Render (both free, no card). Files: `render.yaml` at repo root + `artifacts/downloader/netlify.toml`.
-- **Note for production builds**: keep `youtube-dl-exec` in `onlyBuiltDependencies` (pnpm-workspace.yaml) so the yt-dlp binary downloads on install. Python 3 must be available (Render preinstalls it).
+- **Frontend env**: `VITE_API_URL` (empty in dev → same-origin proxy). In prod set to the Hugging Face Space URL.
+- **Deployment**: see `DEPLOY.md` (Arabic) — frontend on Netlify, backend on Hugging Face Spaces (Docker SDK, free, no credit card). Files: `huggingface/Dockerfile` + `huggingface/README.md` (uploaded to the Space) and `artifacts/downloader/netlify.toml`.
+- **Note for production builds**: keep `youtube-dl-exec` in `onlyBuiltDependencies` (pnpm-workspace.yaml) so the yt-dlp binary downloads on install. The HF Dockerfile installs Python + ffmpeg explicitly.
 
 ## Stack
 
