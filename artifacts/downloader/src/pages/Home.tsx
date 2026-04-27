@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
-import { Download, Link2, Loader2, Sparkles, X, AlertCircle } from "lucide-react";
+import { Download, Link2, Loader2, X, AlertCircle } from "lucide-react";
 import { PlatformsStrip } from "@/components/PlatformsStrip";
 import { FormatList } from "@/components/FormatList";
 import { detectPlatform, platforms } from "@/lib/platforms";
 import { fetchInfo, formatDuration, type VideoInfo } from "@/lib/api";
 
 const HERO_GRADIENT =
-  "radial-gradient(80% 60% at 20% 0%, rgba(99,102,241,0.25), transparent 60%), radial-gradient(60% 50% at 80% 0%, rgba(236,72,153,0.18), transparent 60%), linear-gradient(180deg, #0B1020 0%, #0B1020 60%, #0F1633 100%)";
+  "radial-gradient(80% 60% at 20% 0%, rgba(212,165,116,0.20), transparent 60%), radial-gradient(60% 50% at 80% 0%, rgba(184,115,51,0.18), transparent 60%), linear-gradient(180deg, #1F1410 0%, #2A1810 60%, #3A2418 100%)";
+
+const BRAND_GRADIENT = "linear-gradient(135deg, #B87333 0%, #6F4E37 100%)";
 
 export default function Home() {
   const [url, setUrl] = useState("");
@@ -26,7 +28,7 @@ export default function Home() {
       const data = await fetchInfo(url.trim());
       setInfo(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      setError(err instanceof Error ? err.message : "حصل خطأ غير متوقع");
     } finally {
       setLoading(false);
     }
@@ -39,62 +41,67 @@ export default function Home() {
   };
 
   useEffect(() => {
-    document.title = "GrabIt — Download videos from anywhere";
+    document.title = "GrabIt — حمّل أي فيديو من أي رابط";
   }, []);
 
   return (
     <div
-      className="min-h-screen w-full text-white"
+      className="min-h-screen w-full text-amber-50"
+      dir="rtl"
       style={{ background: HERO_GRADIENT }}
     >
       {/* Top bar */}
       <header className="mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-8">
         <div className="flex items-center gap-2">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-fuchsia-500 shadow-lg">
+          <span
+            className="flex h-9 w-9 items-center justify-center rounded-xl shadow-lg"
+            style={{ background: BRAND_GRADIENT }}
+          >
             <Download size={18} />
           </span>
           <span className="text-lg font-bold tracking-tight">GrabIt</span>
         </div>
         <a
           href="#platforms"
-          className="text-xs font-medium text-white/70 hover:text-white transition-colors"
+          className="text-xs font-medium text-amber-100/70 hover:text-amber-50 transition-colors"
         >
-          {platforms.length}+ platforms supported
+          {platforms.length}+ منصة مدعومة
         </a>
       </header>
 
       {/* Hero */}
-      <section className="mx-auto max-w-4xl px-4 sm:px-8 pt-6 pb-12 text-center">
-        <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-medium text-white/80 backdrop-blur">
-          <Sparkles size={12} />
-          Free · No signup · Audio + Video
+      <section className="mx-auto max-w-4xl px-4 sm:px-8 pt-2 sm:pt-4 pb-10 text-center">
+        <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-amber-100/15 bg-amber-50/5 px-3 py-1 text-[11px] font-medium text-amber-50/80 backdrop-blur">
+          مجاني · بدون تسجيل · صوت + فيديو
         </div>
-        <h1 className="mt-5 text-4xl sm:text-5xl md:text-6xl font-bold leading-[1.05] tracking-tight">
-          Download any video <br className="hidden sm:block" />
-          <span className="bg-gradient-to-r from-indigo-300 via-fuchsia-300 to-rose-300 bg-clip-text text-transparent">
-            from a single link
+        <h1 className="mt-5 text-3xl sm:text-5xl md:text-6xl font-bold leading-[1.2] tracking-tight">
+          حمّل أي فيديو
+          <br />
+          <span className="bg-gradient-to-r from-amber-200 via-orange-200 to-amber-100 bg-clip-text text-transparent">
+            من أي رابط بكل سهولة
           </span>
         </h1>
-        <p className="mx-auto mt-4 max-w-xl text-sm sm:text-base text-white/65">
-          Paste a video or audio URL, pick a quality, and download instantly. Works with the world's biggest platforms.
+        <p className="mx-auto mt-4 max-w-xl text-sm sm:text-base text-amber-50/70">
+          الصق رابط الفيديو أو الصوت، اختار الجودة، وحمّل في ثواني. بيدعم أكبر
+          منصات في العالم.
         </p>
 
         {/* Form */}
         <form
           onSubmit={handleSubmit}
-          className="mx-auto mt-8 w-full max-w-2xl"
+          className="mx-auto mt-7 w-full max-w-2xl"
           data-testid="form-url"
         >
           <div
-            className="group flex items-stretch overflow-hidden rounded-2xl border-2 bg-white/5 backdrop-blur-md shadow-2xl transition-all"
+            className="group flex items-stretch overflow-hidden rounded-2xl border-2 bg-amber-50/5 backdrop-blur-md shadow-2xl transition-all"
             style={{
-              borderColor: platform ? platform.color : "rgba(255,255,255,0.18)",
+              borderColor: platform ? platform.color : "rgba(212,165,116,0.35)",
               boxShadow: platform
                 ? `0 20px 60px -20px ${platform.color}80, 0 0 0 4px ${platform.color}20`
-                : undefined,
+                : "0 20px 60px -25px rgba(184,115,51,0.5)",
             }}
           >
-            <div className="flex items-center pl-4 text-white/50">
+            <div className="flex items-center pe-2 ps-4 text-amber-100/50">
               <Link2 size={18} />
             </div>
             <input
@@ -103,16 +110,17 @@ export default function Home() {
               autoComplete="off"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
-              placeholder="Paste a video or audio link here…"
-              className="flex-1 bg-transparent px-3 py-4 text-sm sm:text-base text-white placeholder-white/40 outline-none"
+              placeholder="الصق الرابط هنا…"
+              dir="ltr"
+              className="flex-1 bg-transparent px-3 py-4 text-sm sm:text-base text-amber-50 placeholder-amber-100/40 outline-none text-start"
               data-testid="input-url"
             />
             {url && (
               <button
                 type="button"
                 onClick={handleClear}
-                className="px-2 text-white/40 hover:text-white"
-                aria-label="Clear"
+                className="px-2 text-amber-100/40 hover:text-amber-50"
+                aria-label="مسح"
                 data-testid="button-clear"
               >
                 <X size={18} />
@@ -121,23 +129,23 @@ export default function Home() {
             <button
               type="submit"
               disabled={loading || !url.trim()}
-              className="flex items-center gap-2 px-5 sm:px-6 font-semibold text-sm sm:text-base text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-4 sm:px-6 font-semibold text-sm sm:text-base text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               style={{
                 background: platform
                   ? platform.gradient ?? platform.color
-                  : "linear-gradient(135deg, #6366F1 0%, #EC4899 100%)",
+                  : BRAND_GRADIENT,
               }}
               data-testid="button-fetch"
             >
               {loading ? (
                 <>
                   <Loader2 size={18} className="animate-spin" />
-                  <span className="hidden sm:inline">Loading…</span>
+                  <span className="hidden sm:inline">جاري الجلب…</span>
                 </>
               ) : (
                 <>
                   <Download size={18} />
-                  <span>Download</span>
+                  <span>حمّل</span>
                 </>
               )}
             </button>
@@ -154,25 +162,27 @@ export default function Home() {
               data-testid="text-platform"
             >
               <platform.icon size={14} />
-              {platform.name} link detected
+              تم اكتشاف رابط {platform.name}
             </div>
           )}
           {!platform && url.trim() && (
-            <div className="mt-3 text-xs text-white/50">
-              We'll still try to handle this link via our universal extractor.
+            <div className="mt-3 text-xs text-amber-100/50">
+              مش متعرف على المنصة، بس هنحاول نشغّله بالمستخرج العام.
             </div>
           )}
         </form>
 
         {error && (
           <div
-            className="mx-auto mt-6 flex max-w-2xl items-start gap-3 rounded-xl border border-rose-500/40 bg-rose-500/10 px-4 py-3 text-left text-sm text-rose-100"
+            className="mx-auto mt-6 flex max-w-2xl items-start gap-3 rounded-xl border border-rose-500/40 bg-rose-500/10 px-4 py-3 text-start text-sm text-rose-100"
             data-testid="text-error"
           >
             <AlertCircle size={18} className="mt-0.5 shrink-0" />
-            <div className="space-y-1">
-              <div className="font-semibold">Couldn't fetch this link</div>
-              <div className="text-rose-200/80 break-words">{error}</div>
+            <div className="space-y-1 min-w-0">
+              <div className="font-semibold">معرفناش نجيب الرابط ده</div>
+              <div className="text-rose-200/80 break-words" dir="ltr">
+                {error}
+              </div>
             </div>
           </div>
         )}
@@ -182,11 +192,11 @@ export default function Home() {
       {info && (
         <section className="mx-auto max-w-5xl px-4 sm:px-8 pb-16">
           <div
-            className="overflow-hidden rounded-3xl border border-white/10 bg-white/95 text-zinc-900 shadow-2xl dark:bg-zinc-950 dark:text-zinc-100"
+            className="overflow-hidden rounded-3xl border border-amber-200/20 bg-amber-50/95 text-zinc-900 shadow-2xl"
             data-testid="card-result"
           >
             <div className="flex flex-col md:flex-row">
-              <div className="md:w-2/5 bg-zinc-100 dark:bg-zinc-900">
+              <div className="md:w-2/5 bg-amber-100">
                 {info.thumbnail ? (
                   <img
                     src={info.thumbnail}
@@ -194,13 +204,13 @@ export default function Home() {
                     className="h-56 w-full object-cover md:h-full"
                   />
                 ) : (
-                  <div className="flex h-56 w-full items-center justify-center text-zinc-400 md:h-full">
-                    No preview
+                  <div className="flex h-56 w-full items-center justify-center text-amber-700/60 md:h-full">
+                    لا توجد معاينة
                   </div>
                 )}
               </div>
-              <div className="flex-1 p-6">
-                <div className="flex items-center gap-2 text-xs font-medium text-zinc-500">
+              <div className="flex-1 p-5 sm:p-6">
+                <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-zinc-500">
                   {platform && (
                     <span
                       className="inline-flex items-center gap-1 rounded-full px-2 py-0.5"
@@ -214,7 +224,7 @@ export default function Home() {
                     </span>
                   )}
                   {!platform && (
-                    <span className="rounded-full bg-zinc-200 px-2 py-0.5 dark:bg-zinc-800">
+                    <span className="rounded-full bg-amber-100 px-2 py-0.5 text-amber-900">
                       {info.extractor}
                     </span>
                   )}
@@ -223,16 +233,26 @@ export default function Home() {
                   {info.uploader && (
                     <>
                       <span>·</span>
-                      <span className="truncate">{info.uploader}</span>
+                      <span className="truncate" dir="ltr">
+                        {info.uploader}
+                      </span>
                     </>
                   )}
                 </div>
-                <h2 className="mt-2 text-xl font-bold leading-tight" data-testid="text-title">
+                <h2
+                  className="mt-2 text-lg sm:text-xl font-bold leading-tight"
+                  dir="auto"
+                  data-testid="text-title"
+                >
                   {info.title}
                 </h2>
 
                 <div className="mt-5">
-                  <FormatList info={info} url={url.trim()} platform={platform} />
+                  <FormatList
+                    info={info}
+                    url={url.trim()}
+                    platform={platform}
+                  />
                 </div>
               </div>
             </div>
@@ -243,16 +263,16 @@ export default function Home() {
       {/* Platforms strip */}
       <section
         id="platforms"
-        className="border-t border-white/10 bg-black/30 backdrop-blur-md"
+        className="border-t border-amber-100/10 bg-black/30 backdrop-blur-md"
       >
         <div className="mx-auto max-w-6xl px-4 sm:px-8 py-8">
-          <div className="mb-4 flex items-end justify-between">
-            <div>
-              <h2 className="text-base font-bold text-white">Supported platforms</h2>
-              <p className="text-xs text-white/60">
-                Tap a tile to see an example link format.
-              </p>
-            </div>
+          <div className="mb-4">
+            <h2 className="text-base font-bold text-amber-50">
+              المنصات المدعومة
+            </h2>
+            <p className="text-xs text-amber-50/60">
+              دوس على أي منصة عشان تشوف شكل الرابط.
+            </p>
           </div>
           <PlatformsStrip
             activeId={platform?.id ?? null}
@@ -264,8 +284,8 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="mx-auto max-w-6xl px-4 sm:px-8 py-6 text-center text-xs text-white/40">
-        Use responsibly · Respect each platform's terms of service.
+      <footer className="mx-auto max-w-6xl px-4 sm:px-8 py-6 text-center text-xs text-amber-50/40">
+        استخدم الموقع باحترام لشروط كل منصة.
       </footer>
     </div>
   );

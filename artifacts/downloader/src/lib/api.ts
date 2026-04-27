@@ -20,6 +20,7 @@ export interface VideoInfo {
   webpageUrl: string;
   extractor: string;
   isAudio: boolean;
+  availableHeights: number[];
   formats: VideoFormat[];
 }
 
@@ -41,7 +42,7 @@ export async function fetchInfo(url: string): Promise<VideoInfo> {
     body: JSON.stringify({ url }),
   });
   if (!res.ok) {
-    let message = "Failed to fetch video info";
+    let message = "تعذر جلب معلومات الفيديو";
     try {
       const data = await res.json();
       if (typeof data?.error === "string") message = data.error;
@@ -55,17 +56,15 @@ export async function fetchInfo(url: string): Promise<VideoInfo> {
 
 export function buildDownloadUrl(params: {
   url: string;
-  formatId?: string;
-  audioOnly?: boolean;
+  quality?: string;
+  audio?: string;
   filename?: string;
-  ext?: string;
 }): string {
   const search = new URLSearchParams();
   search.set("url", params.url);
-  if (params.formatId) search.set("format", params.formatId);
-  if (params.audioOnly) search.set("audio", "1");
+  if (params.quality) search.set("quality", params.quality);
+  if (params.audio) search.set("audio", params.audio);
   if (params.filename) search.set("filename", params.filename);
-  if (params.ext) search.set("ext", params.ext);
   return apiUrl(`/api/download?${search.toString()}`);
 }
 

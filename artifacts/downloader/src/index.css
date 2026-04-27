@@ -69,7 +69,7 @@
   --destructive: 0 80% 60%;
   --destructive-foreground: 0 0% 100%;
 
-  --app-font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --app-font-sans: 'Cairo', 'Inter', system-ui, -apple-system, sans-serif;
   --app-font-mono: 'JetBrains Mono', Menlo, monospace;
   --radius: 0.75rem;
 }

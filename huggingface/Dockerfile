@@ -9,12 +9,17 @@
 
 FROM node:20-bookworm-slim
 
-# yt-dlp needs Python; ffmpeg lets it merge separate audio + video streams.
+# yt-dlp needs Python; ffmpeg lets it merge separate audio + video streams
+# (which is required for the highest YouTube/TikTok qualities).
 RUN apt-get update && apt-get install -y --no-install-recommends \
         python3 python3-pip ca-certificates curl git ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
-# Install pnpm globally as root before dropping privileges.
+# Install yt-dlp globally so it's always available in PATH at /usr/local/bin/yt-dlp.
+# This guarantees the API server can find it even if the bundled binary fails.
+RUN pip3 install --break-system-packages --no-cache-dir -U yt-dlp
+
+# Install pnpm globally (as root) before dropping privileges.
 RUN npm install -g pnpm@10
 
 # The node:20 base image already ships a `node` user at UID 1000.
@@ -32,7 +37,7 @@ ARG GITHUB_REPO=https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME.git
 RUN git clone --depth 1 "$GITHUB_REPO" app
 WORKDIR /home/user/app
 
-# Install dependencies (this also downloads the yt-dlp binary) and build.
+# Install dependencies (this also downloads the bundled yt-dlp binary) and build.
 RUN pnpm install --frozen-lockfile=false
 RUN pnpm --filter @workspace/api-server run build
 
